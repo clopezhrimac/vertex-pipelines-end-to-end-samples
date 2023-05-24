@@ -1,7 +1,9 @@
 from abc import ABCMeta, abstractmethod
 from typing import List
+from dataclasses import dataclass
 
 
+@dataclass
 class AlgorithmStrategyInterface(metaclass=ABCMeta):
     @property
     @abstractmethod
