@@ -34,7 +34,7 @@ test-trigger: ## Runs unit tests for the pipeline trigger code
 
 compile-pipeline: ## Compile the pipeline to training.json or prediction.json. Must specify pipeline=<training|prediction>
 	@cd pipelines && \
-	pipenv run python -m pipelines.${PIPELINE_TEMPLATE}.${pipeline}.pipeline
+	pipenv run python -m pipelines.${pipeline}.pipeline
 
 compile-components: ## Compile all the components in a component group
 	@cd pipeline_components/${GROUP} && \

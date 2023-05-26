@@ -18,7 +18,7 @@ class XGBoostStrategy(AlgorithmStrategyInterface):
     )
     requirements = ["scikit-learn==0.24.0"]
 
-    def hyperparameters(self, label_column_name) -> dict:
+    def hyperparameters(self, **kwargs) -> dict:
         return dict(
             n_estimators=200,
             early_stopping_rounds=10,
@@ -27,7 +27,7 @@ class XGBoostStrategy(AlgorithmStrategyInterface):
             learning_rate=0.3,
             min_split_loss=0,
             max_depth=6,
-            label=label_column_name,
+            label=kwargs["label_column_name"],
         )
 
 
@@ -44,7 +44,7 @@ class TensorflowStrategy(AlgorithmStrategyInterface):
     )
     requirements = []
 
-    def hyperparameters(self) -> dict:
+    def hyperparameters(self, **kwargs) -> dict:
         return dict(
             batch_size=100,
             epochs=5,

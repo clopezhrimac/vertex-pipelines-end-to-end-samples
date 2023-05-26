@@ -1,3 +1,4 @@
+import json
 from abc import ABCMeta, abstractmethod
 from typing import List
 from dataclasses import dataclass
@@ -7,32 +8,11 @@ from dataclasses import dataclass
 class AlgorithmStrategyInterface(metaclass=ABCMeta):
     @property
     @abstractmethod
-    def train_script_name(self):
+    def model_slug(self) -> str:
         pass
 
-    @property
-    @abstractmethod
-    def table_suffix(self) -> str:
-        pass
-
-    @property
     @abstractmethod
     def hyperparameters(self, **kwargs) -> dict:
-        pass
-
-    @property
-    @abstractmethod
-    def default_model_name(self) -> str:
-        pass
-
-    @property
-    @abstractmethod
-    def default_table_suffix(self) -> str:
-        pass
-
-    @property
-    @abstractmethod
-    def script_filename(self) -> str:
         pass
 
     @property
@@ -49,3 +29,15 @@ class AlgorithmStrategyInterface(metaclass=ABCMeta):
     @abstractmethod
     def requirements(self) -> List[str]:
         pass
+
+    def to_dict(self, **kwargs):
+        hparams = self.hyperparameters(**kwargs)
+        return json.dumps(
+            {
+                "model_slug": self.model_slug,
+                "hyperparameters": hparams,
+                "train_container_uri": self.train_container_uri,
+                "serve_container_uri": self.serve_container_uri,
+                "requirements": self.requirements,
+            }
+        )

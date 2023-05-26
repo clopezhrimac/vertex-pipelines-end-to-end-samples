@@ -29,12 +29,13 @@ from pipelines.components import (
 
 
 @dsl.pipeline(name="train-pipeline")
-def tensorflow_pipeline(
-    training_config: dict,
+def pipeline(
+    model_slug: str,
+    hyperparameters: str,
     project_id: str = os.environ.get("VERTEX_PROJECT_ID"),
     project_location: str = os.environ.get("VERTEX_LOCATION"),
     ingestion_project_id: str = os.environ.get("VERTEX_PROJECT_ID"),
-    model_name: str = "simple_tensorflow",
+    model_name: str = None,
     dataset_id: str = "preprocessing",
     dataset_location: str = os.environ.get("VERTEX_LOCATION"),
     ingestion_dataset_id: str = "chicago_taxi_trips",
@@ -44,7 +45,7 @@ def tensorflow_pipeline(
     test_dataset_uri: str = "",
 ):
     """
-    Tensorflow Keras training pipeline which:
+    Training pipeline which:
      1. Splits and extracts a dataset from BQ to GCS
      2. Trains a model via Vertex AI CustomTrainingJob
      3. Evaluates the model against the current champion model
@@ -69,30 +70,32 @@ def tensorflow_pipeline(
         pipeline_files_gcs_path (str): GCS path where the pipeline files are located
         test_dataset_uri (str): Optional. GCS URI of statis held-out test dataset.
     """
+    training_config = {}  # felix - ignore this, just here so I can get the thing to
+    # commit. Idea is one of two approaches:
+    # 1. strategy pattern - one pipeline where the algo can be switched out by providing
+    # a algorithm strategy object (see file algorithm_strategy.py). This will need to be
+    # serialised to get into the pipeline and deserialised as a pipeline step to work as
+    # a single arg. Or a lot of optional arguments will need to be added to the pipeline
+    # function.
+    # 2. we retain two pipelines, and have them inherit shard functionality from a base
+    # file.
+    if model_name is None:
+        model_name = training_config["default_model_name"]
 
     # Create variables to ensure the same arguments are passed
     # into different components of the pipeline
     label_column_name = "total_fare"
     time_column = "trip_start_timestamp"
     ingestion_table = "taxi_trips"
-    table_suffix = "_tf_training"  # suffix to table names
+    table_suffix = training_config["table_suffix"]  # suffix to table names
     ingested_table = "ingested_data" + table_suffix
     preprocessed_table = "preprocessed_data" + table_suffix
     train_table = "train_data" + table_suffix
     valid_table = "valid_data" + table_suffix
     test_table = "test_data" + table_suffix
     primary_metric = "rootMeanSquaredError"
-    train_script_uri = f"{pipeline_files_gcs_path}/training/assets/train_tf_model.py"
-    hparams = dict(
-        batch_size=100,
-        epochs=5,
-        loss_fn="MeanSquaredError",
-        optimizer="Adam",
-        learning_rate=0.01,
-        hidden_units=[(64, "relu"), (32, "relu")],
-        distribute_strategy="single",
-        early_stopping_epochs=5,
-    )
+    train_script_uri = f"{pipeline_files_gcs_path}/training/assets/{training_config['train_script_name']}"  # noqa: E501
+    hparams = training_config["hyperparameters"]
 
     # generate sql queries which are used in ingestion and preprocessing
     # operations
@@ -228,8 +231,8 @@ def tensorflow_pipeline(
         project_id=project_id,
         project_location=project_location,
         model_display_name=model_name,
-        train_container_uri="europe-docker.pkg.dev/vertex-ai/training/tf-cpu.2-6:latest",  # noqa: E501
-        serving_container_uri="europe-docker.pkg.dev/vertex-ai/prediction/tf2-cpu.2-6:latest",  # noqa: E501
+        train_container_uri=training_config["train_container_uri"],
+        serving_container_uri=training_config["serving_container_uri"],
         hparams=hparams,
         staging_bucket=staging_bucket,
         parent_model=existing_model,
@@ -257,7 +260,7 @@ def tensorflow_pipeline(
 
 if __name__ == "__main__":
     compiler.Compiler().compile(
-        pipeline_func=tensorflow_pipeline,
+        pipeline_func=pipeline,
         package_path="training.json",
         type_check=False,
     )
