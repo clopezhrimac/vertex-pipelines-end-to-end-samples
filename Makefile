@@ -38,6 +38,9 @@ install: ## Set up local environment for Python development on pipelines
 	@cd pipelines && \
 	poetry install --with dev && \
 	cd .. && \
+	cd utilities && \
+	poetry install --with dev && \
+	cd .. && \
 	for component_group in components/*/ ; do \
 		echo "Setup for $$component_group" && \
 		cd "$$component_group" && \
@@ -88,9 +91,13 @@ test: ## Run unit tests for a specific component group or for all component grou
 		cd components/${GROUP} && \
 		poetry run pytest ; \
 	else \
-		echo "Testing scripts" && \
+		echo "Testing pipeline scripts" && \
 		cd pipelines && \
 		poetry run python -m pytest tests/utils &&\
+		cd .. && \
+		echo "Testing utilities library" && \
+		cd utilities && \
+		poetry run python -m pytest &&\
 		cd .. && \
 		for i in components/*/ ; do \
 			echo "Test components under $$i" && \
