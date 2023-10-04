@@ -15,6 +15,7 @@ import joblib
 import os
 
 import pandas as pd
+import numpy as np
 from fastapi import FastAPI, Request
 from google.cloud import storage
 
@@ -37,6 +38,7 @@ async def predict(request: Request):
 
     instances = body["instances"]
     inputs_df = pd.DataFrame(instances)
-    outputs = _model.predict(inputs_df).tolist()
+    inputs_df.replace({None: np.nan}, inplace=True)
+    outputs = _model.predict_proba(inputs_df).tolist()
 
     return {"predictions": outputs}
