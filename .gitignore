@@ -166,3 +166,6 @@ env.sh
 # Compiled pipelines
 **/*pipeline.json
 **/*pipeline.yaml
+
+# Model artifacts
+model/*/training/model_artifacts/
