@@ -11,14 +11,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-FROM python:3.9.16-slim AS builder
+FROM python:3.9.16 AS builder
 
 ENV PIP_NO_CACHE_DIR=off \
     PIP_DISABLE_PIP_VERSION_CHECK=on \
     PIP_DEFAULT_TIMEOUT=100
 
-ARG POETRY_VERSION=1.5.1
+ARG POETRY_VERSION=1.6.1
 
+COPY utilities/ utilities/
 COPY pyproject.toml pyproject.toml
 COPY poetry.lock poetry.lock
 
@@ -27,7 +28,13 @@ RUN poetry config virtualenvs.create false && poetry install
 
 FROM builder AS training
 
-COPY training/train.py training/train.py
+ARG MODEL_NAME
+
+WORKDIR /training
+
+COPY ${MODEL_NAME}/training/src ./src/
+
+ENTRYPOINT ["python", "-m", "src.main"]
 
 FROM builder AS serving
 

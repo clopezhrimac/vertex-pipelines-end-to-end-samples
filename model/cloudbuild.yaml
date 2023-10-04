@@ -18,3 +18,4 @@ steps:
       - --destination=${_DESTINATION_IMAGE_URI}
       - --target=${_DOCKER_TARGET}
       - --cache=true
+      - --build-arg=MODEL_NAME=${_MODEL_NAME}
