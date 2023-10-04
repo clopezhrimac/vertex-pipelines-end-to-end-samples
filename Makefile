@@ -38,8 +38,12 @@ install: ## Set up local environment for Python development on pipelines
 	@cd pipelines && \
 	poetry install --with dev && \
 	cd .. && \
-	cd utilities && \
+	cd model/utilities && \
 	poetry install --with dev && \
+	cd ../.. && \
+	cd model && \
+	poetry install --with dev,notebook && \
+	poetry run python -m ipykernel install --user --name ${SOLUTION_NAME} && \
 	cd .. && \
 	for component_group in components/*/ ; do \
 		echo "Setup for $$component_group" && \
@@ -54,15 +58,15 @@ compile: ## Compile the pipeline to pipeline.yaml. Must specify pipeline=<traini
 	poetry run kfp dsl compile --py pipelines/${pipeline}/pipeline.py --output pipelines/${pipeline}/pipeline.yaml --function pipeline
 
 targets ?= training serving
-build: ## Build and push training and/or serving container(s) image using Docker. Specify targets=<training serving> e.g. targets=training or targets="training serving" (default)
+build: ## Build and push training and/or serving container(s) image using Docker. Specify targets=<training serving> e.g. targets=training or targets="training serving" (default) and MODEL e.g. MODEL=propension
 	@cd model && \
 	for target in $$targets ; do \
 		echo "Building $$target image" && \
 		gcloud builds submit . \
 		--region=${VERTEX_LOCATION} \
 		--project=${VERTEX_PROJECT_ID} \
-		--gcs-source-staging-dir=gs://${VERTEX_PROJECT_ID}-staging/source \
-		--substitutions=_DOCKER_TARGET=$$target,_DESTINATION_IMAGE_URI=${CONTAINER_IMAGE_REGISTRY}/$$target:${RESOURCE_SUFFIX} ; \
+		--gcs-source-staging-dir=gs://${VERTEX_PROJECT_ID}_cloudbuild/source \
+		--substitutions=_DOCKER_TARGET=$$target,_DESTINATION_IMAGE_URI=${CONTAINER_URI_PREFIX}/custom-$$target-images/${SOLUTION_NAME}-${MODEL}:latest,_MODEL_NAME=${MODEL} ; \
 	done 
 
 
@@ -90,19 +94,27 @@ test: ## Run unit tests for a specific component group or for all component grou
 		echo "Test components under components/${GROUP}" && \
 		cd components/${GROUP} && \
 		poetry run pytest ; \
+	elif [ -n "${MODEL}" ]; then \
+		echo "Test components under model/${MODEL}" && \
+		cd model/${MODEL}/training && \
+		poetry run pytest ; \
 	else \
 		echo "Testing pipeline scripts" && \
 		cd pipelines && \
-		poetry run python -m pytest tests/utils &&\
-		cd .. && \
-		echo "Testing utilities library" && \
-		cd utilities && \
-		poetry run python -m pytest &&\
+		poetry run python -m pytest tests/utils && \
 		cd .. && \
 		for i in components/*/ ; do \
 			echo "Test components under $$i" && \
 			cd "$$i" && \
 			poetry run pytest && \
-			cd ../.. ;\
+			cd ../.. ; \
+		done ; \
+		for i in model/*/ ; do \
+			if [ "$$i" != "model/utilities/" ]; then \
+				echo "Test $$i model training scripts" && \
+				cd "$$i/training/" && \
+				poetry run pytest && \
+				cd ../.. ; \
+			fi \
 		done ; \
 	fi
