@@ -22,9 +22,13 @@ from google.cloud import storage
 app = FastAPI()
 client = storage.Client()
 
-with open("model.joblib", "wb") as f:
-    client.download_blob_to_file(f"{os.environ['AIP_STORAGE_URI']}/model.joblib", f)
-_model = joblib.load("model.joblib")
+if 'AIP_STORAGE_URI' in os.environ:
+    with open("model.joblib", "wb") as f:
+        client.download_blob_to_file(f"{os.environ['AIP_STORAGE_URI']}/model.joblib", f)
+    _model = joblib.load("model.joblib")
+else:
+    artifact_path = './training/model_artifacts'
+    _model = joblib.load(f"{artifact_path}/model.joblib")
 
 
 @app.get(os.environ.get("AIP_HEALTH_ROUTE", "/healthz"))

@@ -15,4 +15,5 @@ class StringContainsTransformer(BaseEstimator, TransformerMixin):
         return flag_df.astype(float)
 
     def get_feature_names_out(self, feature_names):
-        return self.column_names
+        features_names_out = [f"{name}_{self.target_string}" for name in self.column_names]
+        return features_names_out

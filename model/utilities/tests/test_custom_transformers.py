@@ -40,3 +40,25 @@ def test_string_contains_transformer_with_nans(input_data, target_string, expect
     transformer = StringContainsTransformer(target_string)
     result = transformer.fit_transform(input_data)
     pd.testing.assert_frame_equal(result, expected_output)
+
+
+@pytest.mark.parametrize("target_string, expected_feature_names_out", [
+    ('apple', ['text_column_1_apple', 'text_column_2_apple']),
+    ('banana', ['text_column_1_banana', 'text_column_2_banana']),
+    ('cherry', ['text_column_1_cherry', 'text_column_2_cherry']),
+])
+def test_get_feature_names_out(target_string, expected_feature_names_out):
+    """
+    Verify if the get_feature_names_out method of the StringContainsTransformer correctly transforms
+    the feature names based on the provided target string and compares it to the expected result.
+    """
+    example_data = pd.DataFrame({
+        'text_column_1': ['apple', 'banana', np.nan, 'date'],
+        'text_column_2': ['apple', np.nan, 'cherry', 'date']
+    })
+
+    transformer = StringContainsTransformer(target_string)
+    transformer.fit(example_data)
+    feature_names_out = transformer.get_feature_names_out(example_data.columns.tolist())
+
+    assert feature_names_out == expected_feature_names_out
