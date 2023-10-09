@@ -58,16 +58,19 @@ compile: ## Compile the pipeline to pipeline.yaml. Must specify pipeline=<traini
 	poetry run kfp dsl compile --py pipelines/${pipeline}/pipeline.py --output pipelines/${pipeline}/pipeline.yaml --function pipeline
 
 targets ?= training serving
-build: ## Build and push training and/or serving container(s) image using Docker. Specify targets=<training serving> e.g. targets=training or targets="training serving" (default) and MODEL e.g. MODEL=propension
+models ?= propension
+build: ## Build and push training and/or serving container(s) image using Docker. Specify targets=<training serving> e.g. targets=training or targets="training serving" (default) and MODEL e.g. models=propension siniestralidad persistencia
 	@cd model && \
-	for target in $$targets ; do \
-		echo "Building $$target image for ${MODEL} model" && \
-		gcloud builds submit . \
-		--region=${VERTEX_LOCATION} \
-		--project=${VERTEX_PROJECT_ID} \
-		--gcs-source-staging-dir=gs://${VERTEX_PROJECT_ID}_cloudbuild/source \
-		--substitutions=_DOCKER_TARGET=$$target,_DESTINATION_IMAGE_URI=${CONTAINER_URI_PREFIX}/custom-$$target-images/${SOLUTION_NAME}-${MODEL}:latest,_MODEL_NAME=${MODEL} ; \
-	done 
+	for model in $$models; do \
+		for target in $$targets ; do \
+			echo "Building $$target image for $$model model" && \
+			gcloud builds submit . \
+			--region=${VERTEX_LOCATION} \
+			--project=${VERTEX_PROJECT_ID} \
+			--gcs-source-staging-dir=gs://${VERTEX_PROJECT_ID}_cloudbuild/source \
+			--substitutions=_DOCKER_TARGET=$$target,_DESTINATION_IMAGE_URI=${CONTAINER_URI_PREFIX}/custom-$$target-images/${SOLUTION_NAME}-$$model:latest,_MODEL_NAME=$$model ; \
+		done \
+	done
 
 
 compile ?= true
@@ -81,7 +84,7 @@ run: ## Run pipeline in sandbox environment. Must specify pipeline=<training|pre
 		exit ; \
 	fi && \
 	if [ $(build) = "true" ]; then \
-		$(MAKE) build MODEL=${MODEL}; \
+		$(MAKE) build models=${MODELS}; \
 	elif [ $(build) != "false" ]; then \
 		echo "ValueError: build must be either true or false" ; \
 		exit ; \
