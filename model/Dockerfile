@@ -39,6 +39,6 @@ ENTRYPOINT ["python", "-m", "src.main"]
 FROM builder AS serving
 
 RUN poetry install --with serving
-COPY serving/main.py serving/main.py
+COPY ${MODEL_NAME}/serving/main.py serving/main.py
 
 CMD exec uvicorn serving.main:app --host "0.0.0.0" --port "$AIP_HTTP_PORT"

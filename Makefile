@@ -81,7 +81,7 @@ run: ## Run pipeline in sandbox environment. Must specify pipeline=<training|pre
 		exit ; \
 	fi && \
 	if [ $(build) = "true" ]; then \
-		$(MAKE) build ; \
+		$(MAKE) build MODEL=${MODEL}; \
 	elif [ $(build) != "false" ]; then \
 		echo "ValueError: build must be either true or false" ; \
 		exit ; \
@@ -109,6 +109,10 @@ test: ## Run unit tests for a specific component group or for all component grou
 			poetry run pytest && \
 			cd ../.. ; \
 		done ; \
+		echo "Testing utilities library" && \
+		cd model/utilities && \
+		poetry run python -m pytest && \
+		cd ../.. && \
 		for i in model/*/ ; do \
 			if [ "$$i" != "model/utilities/" ]; then \
 				echo "Test $$i model training scripts" && \
