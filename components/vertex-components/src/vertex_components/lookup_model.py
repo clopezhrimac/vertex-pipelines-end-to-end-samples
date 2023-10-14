@@ -93,7 +93,7 @@ def lookup_model(
         )
         model.metadata["resourceName"] = target_model.versioned_resource_name
 
-        path = Path('/gcs/' + target_model.uri[5:]) / TRAINING_DATASET_INFO
+        path = Path("/gcs/" + target_model.uri[5:]) / TRAINING_DATASET_INFO
         logging.info(f"Reading training dataset metadata: {path}")
 
         if os.path.exists(path):

@@ -10,7 +10,12 @@ def test_model_reproducibility(synthetic_data):
     """
 
     X_train, X_test, y_train, y_test = synthetic_data
-    hyperparameters = {"n_estimators": 1500, "objective": "binary", "learning_rate": 0.01, "max_depth": 3}
+    hyperparameters = {
+        "n_estimators": 1500,
+        "objective": "binary",
+        "learning_rate": 0.01,
+        "max_depth": 3,
+    }
     model = create_model(hyperparameters)
     model.fit(X_train, y_train)
     y_pred_proba = model.predict_proba(X_test)[:, 1]

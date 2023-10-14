@@ -33,7 +33,7 @@ def train(
     metrics: Output[Metrics],
     feature_importance: Output[Metrics],
     hparams: dict,
-    label: str
+    label: str,
 ):
     return dsl.ContainerSpec(
         image=config.train_container_uri,
@@ -67,7 +67,7 @@ def pipeline(
     model_name: str = config.model_name,
     dataset_id: str = config.dataset_id,
     dataset_location: str = config.dataset_location,
-    period: str = config.period
+    period: str = config.period,
 ):
     """
     XGB training pipeline which:
@@ -128,20 +128,13 @@ def pipeline(
     )
 
     # data ingestion and preprocessing operations
-    target_engineering = (
-        BigqueryQueryJobOp(
-            project=project_id,
-            location=dataset_location,
-            query=target_engineering_query
-        )
-        .set_display_name("Target Engineering")
-    )
+    target_engineering = BigqueryQueryJobOp(
+        project=project_id, location=dataset_location, query=target_engineering_query
+    ).set_display_name("Target Engineering")
 
     enrich = (
         BigqueryQueryJobOp(
-            project=project_id,
-            location=dataset_location,
-            query=enrich_query
+            project=project_id, location=dataset_location, query=enrich_query
         )
         .after(target_engineering)
         .set_display_name("Enrich")
@@ -149,9 +142,7 @@ def pipeline(
 
     split_data = (
         BigqueryQueryJobOp(
-            project=project_id,
-            location=dataset_location,
-            query=split_data_query
+            project=project_id, location=dataset_location, query=split_data_query
         )
         .after(enrich)
         .set_display_name("Split data")
@@ -202,7 +193,7 @@ def pipeline(
         valid_data=valid_dataset,
         test_data=test_dataset,
         hparams=config.hparams,
-        label=config.target_column
+        label=config.target_column,
     ).set_display_name("Train model")
 
     _ = upload_model(

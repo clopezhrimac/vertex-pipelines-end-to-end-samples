@@ -48,7 +48,11 @@ def test_read_dataset_invalid_file_paths():
     Test if the function raises FileNotFoundError for invalid file paths.
     """
     with pytest.raises(FileNotFoundError):
-        read_datasets("path/to/invalid_train.csv", "path/to/invalid_valid.csv", "path/to/invalid_test.csv")
+        read_datasets(
+            "path/to/invalid_train.csv",
+            "path/to/invalid_valid.csv",
+            "path/to/invalid_test.csv",
+        )
 
 
 def test_split_xy_valid_label(dataframe_test):

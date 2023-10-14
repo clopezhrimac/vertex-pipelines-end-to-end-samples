@@ -5,12 +5,21 @@ import logging
 
 from .feature_constants import NUM_COLS, OHE_COLS
 from .feature_constants import AGE_COL, NSE_COL, RCC_COL, DES_CONO_COL, COMBO_COL
-from .feature_constants import NSE_CATEGORY_ORDER, RCC_CATEGORY_ORDER, LIMA_PROV_CATEGORY_ORDER
+from .feature_constants import (
+    NSE_CATEGORY_ORDER,
+    RCC_CATEGORY_ORDER,
+    LIMA_PROV_CATEGORY_ORDER,
+)
 
 from utilities import save_metrics, save_model_artifact, save_training_dataset_metadata
 from utilities import read_datasets, split_xy, indices_in_list
 
-from utilities import build_ml_pipeline, fit_ml_pipeline, evaluate_model, calculate_feature_importance
+from utilities import (
+    build_ml_pipeline,
+    fit_ml_pipeline,
+    evaluate_model,
+    calculate_feature_importance,
+)
 from .transformers import create_model, build_preprocessing_transformer
 
 logging.basicConfig(level=logging.INFO)
@@ -24,7 +33,9 @@ def main():
     parser.add_argument("--train-data", type=str, required=True)
     parser.add_argument("--valid-data", type=str, required=True)
     parser.add_argument("--test-data", type=str, required=True)
-    parser.add_argument("--model", default=os.getenv("AIP_MODEL_DIR"), type=str, help="")
+    parser.add_argument(
+        "--model", default=os.getenv("AIP_MODEL_DIR"), type=str, help=""
+    )
     parser.add_argument("--metrics", type=str, required=True)
     parser.add_argument("--feature-importance", type=str, required=True)
     parser.add_argument("--label", type=str, required=True)
@@ -32,7 +43,9 @@ def main():
     args = parser.parse_args()
 
     logging.info("Read csv files into dataframes")
-    df_train, df_valid, df_test = read_datasets(args.train_data, args.valid_data, args.test_data)
+    df_train, df_valid, df_test = read_datasets(
+        args.train_data, args.valid_data, args.test_data
+    )
 
     logging.info("Split dataframes")
     label = args.label
@@ -49,7 +62,7 @@ def main():
         "rcc": indices_in_list(RCC_COL, col_list),
         "cono_agrup": indices_in_list(DES_CONO_COL, col_list),
         "lima_prov": indices_in_list(OHE_COLS, col_list),
-        "products": indices_in_list(COMBO_COL, col_list)
+        "products": indices_in_list(COMBO_COL, col_list),
     }
 
     logging.info("Get category order of categorical columns in base data")
@@ -82,7 +95,9 @@ def main():
     logging.info(f"Feature Importance {feature_importance}")
     save_metrics(feature_importance, args.feature_importance)
 
-    logging.info(f"Persist URIs of training file(s) for model monitoring in batch predictions")
+    logging.info(
+        f"Persist URIs of training file(s) for model monitoring in batch predictions"
+    )
     save_training_dataset_metadata(args.model, args.train_data, label)
 
 

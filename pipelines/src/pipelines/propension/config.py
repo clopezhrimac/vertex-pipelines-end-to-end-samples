@@ -54,12 +54,18 @@ class TrainingConfig(Config):
     test_final_date = "2023-04-01"
 
     primary_metric = "auRoc"
-    hparams = dict(n_estimators=1500, objective="binary", learning_rate=0.01, max_depth=3)
+    hparams = dict(
+        n_estimators=1500, objective="binary", learning_rate=0.01, max_depth=3
+    )
 
-    train_container_uri = f"{env.get('CONTAINER_URI_PREFIX')}/custom-training-images/{Config.solution_name}-" \
-                          f"{Config.model_type}:latest"
-    serving_container_uri = f"{env.get('CONTAINER_URI_PREFIX')}/custom-serving-images/{Config.solution_name}-" \
-                            f"{Config.model_type}:latest"
+    train_container_uri = (
+        f"{env.get('CONTAINER_URI_PREFIX')}/custom-training-images/{Config.solution_name}-"
+        f"{Config.model_type}:latest"
+    )
+    serving_container_uri = (
+        f"{env.get('CONTAINER_URI_PREFIX')}/custom-serving-images/{Config.solution_name}-"
+        f"{Config.model_type}:latest"
+    )
     serving_container_predict_route = "/predict"
     serving_container_health_route = "/health"
 

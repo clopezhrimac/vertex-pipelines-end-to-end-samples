@@ -89,20 +89,13 @@ def pipeline(
         feature_store_dataset=config.feature_store_dataset,
     )
 
-    population = (
-        BigqueryQueryJobOp(
-            project=project_id,
-            location=dataset_location,
-            query=population_query
-        )
-        .set_display_name("Get population data")
-    )
+    population = BigqueryQueryJobOp(
+        project=project_id, location=dataset_location, query=population_query
+    ).set_display_name("Get population data")
 
     enrich = (
         BigqueryQueryJobOp(
-            project=project_id,
-            location=dataset_location,
-            query=enrich_query
+            project=project_id, location=dataset_location, query=enrich_query
         )
         .after(population)
         .set_display_name("Enrich")
@@ -121,7 +114,9 @@ def pipeline(
     )
 
     # batch predict from BigQuery to BigQuery
-    bigquery_source_input_uri = f"bq://{project_id}.{dataset_id}.{config.enriched_table}"
+    bigquery_source_input_uri = (
+        f"bq://{project_id}.{dataset_id}.{config.enriched_table}"
+    )
     bigquery_destination_output_uri = f"bq://{project_id}.{dataset_id}"
 
     batch_prediction = (
@@ -138,7 +133,7 @@ def pipeline(
             machine_type=batch_prediction_machine_type,
             starting_replica_count=batch_prediction_min_replicas,
             max_replica_count=batch_prediction_max_replicas,
-            manual_batch_tuning_parameters_batch_size=batch_prediction_batch_size
+            manual_batch_tuning_parameters_batch_size=batch_prediction_batch_size,
         )
         .set_caching_options(False)
         .after(enrich)

@@ -18,7 +18,7 @@ def column_indices():
         "rcc": [5],
         "cono_agrup": [6],
         "lima_prov": [7],
-        "products": [9]
+        "products": [9],
     }
 
 
@@ -38,5 +38,7 @@ def synthetic_data():
     num_features = 10
     X = np.random.rand(num_samples, num_features)
     y = np.random.randint(2, size=num_samples)
-    X_train, X_valid, y_train, y_valid = train_test_split(X, y, test_size=0.2, random_state=42)
+    X_train, X_valid, y_train, y_valid = train_test_split(
+        X, y, test_size=0.2, random_state=42
+    )
     return X_train, X_valid, y_train, y_valid

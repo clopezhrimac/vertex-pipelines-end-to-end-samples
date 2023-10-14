@@ -1,4 +1,9 @@
-from utilities.ml_pipeline import build_ml_pipeline, fit_ml_pipeline, calculate_feature_importance, evaluate_model
+from utilities.ml_pipeline import (
+    build_ml_pipeline,
+    fit_ml_pipeline,
+    calculate_feature_importance,
+    evaluate_model,
+)
 from unittest.mock import MagicMock
 
 from sklearn.pipeline import Pipeline
@@ -90,11 +95,19 @@ def test_calculate_feature_importance_sorted_importance(pipeline_mock):
 @pytest.mark.parametrize(
     "feature_importances, expected_importances",
     [
-        (np.array([5, 6, 7, 8]), {"feature4": 8, "feature3": 7, "feature2": 6, "feature1": 5}),
-        (np.array([0.5, 0.6, 0.7, 0.8]), {"feature4": 0.8, "feature3": 0.7, "feature2": 0.6, "feature1": 0.5}),
+        (
+            np.array([5, 6, 7, 8]),
+            {"feature4": 8, "feature3": 7, "feature2": 6, "feature1": 5},
+        ),
+        (
+            np.array([0.5, 0.6, 0.7, 0.8]),
+            {"feature4": 0.8, "feature3": 0.7, "feature2": 0.6, "feature1": 0.5},
+        ),
     ],
 )
-def test_calculate_feature_importance_correct_values(pipeline_mock, feature_importances, expected_importances):
+def test_calculate_feature_importance_correct_values(
+    pipeline_mock, feature_importances, expected_importances
+):
     """
     Test the correctness of importance values in the output of 'calculate_feature_importance'
     """
