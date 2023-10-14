@@ -21,12 +21,12 @@ TRAINING_DATASET_INFO = "training_dataset.json"
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--train_data", type=str, required=True)
-    parser.add_argument("--valid_data", type=str, required=True)
-    parser.add_argument("--test_data", type=str, required=True)
+    parser.add_argument("--train-data", type=str, required=True)
+    parser.add_argument("--valid-data", type=str, required=True)
+    parser.add_argument("--test-data", type=str, required=True)
     parser.add_argument("--model", default=os.getenv("AIP_MODEL_DIR"), type=str, help="")
     parser.add_argument("--metrics", type=str, required=True)
-    parser.add_argument("--feature_importance", type=str, required=True)
+    parser.add_argument("--feature-importance", type=str, required=True)
     parser.add_argument("--label", type=str, required=True)
     parser.add_argument("--hparams", default={}, type=json.loads)
     args = parser.parse_args()
