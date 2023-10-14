@@ -100,7 +100,7 @@ def build_categorical_transformers(
         ("rcc_encoding", rcc_pipe, column_indices["rcc"]),
         ("cono_agrup_encoding", des_cono_agrup_pipe, column_indices["cono_agrup"]),
         ("lima_prov_encoding", des_lima_prov_pipe, column_indices["lima_prov"]),
-        ("flag_desgravamen", StringContainsTransformer(target_string='DESGRAVAMEN'), column_indices["products"])
+        ("flag_desgravamen", StringContainsTransformer(target_string='DESGRA'), column_indices["products"])
     ]
     return categorical_transformers
 
