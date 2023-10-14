@@ -31,7 +31,8 @@ def test_string_contains_transformer_without_nans(input_data, target_string, exp
 @pytest.mark.parametrize("input_data, target_string, expected_output", [
     (pd.DataFrame({'text_column': ['banana', np.nan]}), 'e', pd.DataFrame({'text_column': [0.0, np.nan]})),
     (pd.DataFrame({'text_column': ['banana', np.nan]}), 'na', pd.DataFrame({'text_column': [1.0, np.nan]})),
-    (pd.DataFrame({'text_column': [np.nan, 'kiwis']}), 'kiwi', pd.DataFrame({'text_column': [np.nan, 1.0]}))
+    (pd.DataFrame({'text_column': [np.nan, 'kiwis']}), 'kiwi', pd.DataFrame({'text_column': [np.nan, 1.0]})),
+    (pd.DataFrame({'text_column': [np.nan]}), 'ga', pd.DataFrame({'text_column': [np.nan]}))
 ])
 def test_string_contains_transformer_with_nans(input_data, target_string, expected_output):
     """
@@ -43,9 +44,9 @@ def test_string_contains_transformer_with_nans(input_data, target_string, expect
 
 
 @pytest.mark.parametrize("target_string, expected_feature_names_out", [
-    ('apple', ['text_column_1_apple', 'text_column_2_apple']),
-    ('banana', ['text_column_1_banana', 'text_column_2_banana']),
-    ('cherry', ['text_column_1_cherry', 'text_column_2_cherry']),
+    ('apple', ['text_column_1_apple', 'text_column_2_apple', 'text_column_3_apple']),
+    ('banana', ['text_column_1_banana', 'text_column_2_banana', 'text_column_3_banana']),
+    ('cherry', ['text_column_1_cherry', 'text_column_2_cherry', 'text_column_3_cherry']),
 ])
 def test_get_feature_names_out(target_string, expected_feature_names_out):
     """
@@ -54,7 +55,8 @@ def test_get_feature_names_out(target_string, expected_feature_names_out):
     """
     example_data = pd.DataFrame({
         'text_column_1': ['apple', 'banana', np.nan, 'date'],
-        'text_column_2': ['apple', np.nan, 'cherry', 'date']
+        'text_column_2': ['apple', np.nan, 'cherry', 'date'],
+        'text_column_3': [np.nan, np.nan, np.nan, np.nan]
     })
 
     transformer = StringContainsTransformer(target_string)
