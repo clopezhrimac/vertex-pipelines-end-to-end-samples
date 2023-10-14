@@ -31,7 +31,7 @@ def test_lookup_model(mock_model, tmpdir):
     # Mock attribute and method
     mock_path = tmpdir
     mock_model.resource_name = "my-model-resource-name"
-    mock_model.uri = mock_path
+    mock_model.uri = str(mock_path)
     mock_model.list.return_value = [mock_model]
 
     # Invoke the model look up

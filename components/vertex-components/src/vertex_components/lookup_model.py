@@ -12,19 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from kfp.dsl import component, Output, Model
+from kfp.dsl import component, Output
+from google_cloud_pipeline_components.types.artifact_types import VertexModel
 from typing import NamedTuple
 
 
 @component(
     base_image="python:3.9",
-    packages_to_install=["google-cloud-aiplatform==1.30.1"],
+    packages_to_install=[
+        "google-cloud-aiplatform==1.30.1",
+        "google-cloud-pipeline-components==2.1.0",
+    ],
 )
 def lookup_model(
     model_name: str,
     project_location: str,
     project_id: str,
-    model: Output[Model],
+    model: Output[VertexModel],
     order_models_by: str = "create_time desc",
     fail_on_model_not_found: bool = False,
 ) -> NamedTuple("Outputs", [("model_resource_name", str), ("training_dataset", dict)]):
@@ -82,10 +86,14 @@ def lookup_model(
         logging.info(f"model display name: {target_model.display_name}")
         logging.info(f"model resource name: {target_model.resource_name}")
         logging.info(f"model uri: {target_model.uri}")
-        model.uri = target_model.uri
-        model.metadata["resourceName"] = target_model.resource_name
 
-        path = Path(model.path) / TRAINING_DATASET_INFO
+        model.uri = (
+            f"https://{project_location}-aiplatform.googleapis.com/v1/"
+            f"{target_model.versioned_resource_name}"
+        )
+        model.metadata["resourceName"] = target_model.versioned_resource_name
+
+        path = Path('/gcs/' + target_model.uri[5:]) / TRAINING_DATASET_INFO
         logging.info(f"Reading training dataset metadata: {path}")
 
         if os.path.exists(path):

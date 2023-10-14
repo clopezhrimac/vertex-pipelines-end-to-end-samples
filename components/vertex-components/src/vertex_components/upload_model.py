@@ -36,7 +36,7 @@ def upload_model(
     pipeline_job_id: str,
     serving_container_image: str,
     evaluation_name: str = "Imported evaluation",
-) -> None:
+) :
     """
     Args:
         model (Model): Input challenger model.
