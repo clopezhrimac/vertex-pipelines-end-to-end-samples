@@ -100,7 +100,11 @@ def build_categorical_transformers(
         ("rcc_encoding", rcc_pipe, column_indices["rcc"]),
         ("cono_agrup_encoding", des_cono_agrup_pipe, column_indices["cono_agrup"]),
         ("lima_prov_encoding", des_lima_prov_pipe, column_indices["lima_prov"]),
-        ("flag_desgravamen", StringContainsTransformer(target_string='DESGRAVAMEN'), column_indices["products"])
+        (
+            "flag_desgravamen",
+            StringContainsTransformer(target_string="DESGRA"),
+            column_indices["products"],
+        ),
     ]
     return categorical_transformers
 
@@ -118,7 +122,9 @@ def build_preprocessing_transformer(
         ColumnTransformer: A ColumnTransformer object representing the preprocessing pipeline.
     """
     numeric_transformers = build_numeric_transformers(column_indices)
-    categorical_transformers = build_categorical_transformers(column_indices, categories_order)
+    categorical_transformers = build_categorical_transformers(
+        column_indices, categories_order
+    )
 
     all_transformers = numeric_transformers + categorical_transformers
     preprocesser = ColumnTransformer(transformers=all_transformers)

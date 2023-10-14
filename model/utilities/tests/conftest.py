@@ -26,7 +26,9 @@ class MockFeatureEngineeringStep:
         self.feature_names = names
 
     def get_feature_names_out(self):
-        return ["__".join(["transformer_name", feature]) for feature in self.feature_names]
+        return [
+            "__".join(["transformer_name", feature]) for feature in self.feature_names
+        ]
 
 
 @pytest.fixture
@@ -49,7 +51,9 @@ def synthetic_data():
     num_features = 10
     X = np.random.rand(num_samples, num_features)
     y = np.random.randint(2, size=num_samples)
-    X_train, X_valid, y_train, y_valid = train_test_split(X, y, test_size=0.2, random_state=42)
+    X_train, X_valid, y_train, y_valid = train_test_split(
+        X, y, test_size=0.2, random_state=42
+    )
     return X_train, X_valid, y_train, y_valid
 
 
@@ -93,10 +97,15 @@ def pipeline_mock(feature_importances, feature_names):
 
 @pytest.fixture
 def metrics():
-    metrics = {"problemType": "classification", "auPrc": 0.15, "auRoc": 0.75, "logLoss": 0.15}
+    metrics = {
+        "problemType": "classification",
+        "auPrc": 0.15,
+        "auRoc": 0.75,
+        "logLoss": 0.15,
+    }
     return metrics
 
 
 @pytest.fixture
 def sample_transformer_data():
-    return pd.DataFrame({'text_column': ['apple', 'banana', 'cherry', 'date', np.nan]})
+    return pd.DataFrame({"text_column": ["apple", "banana", "cherry", "date", np.nan]})

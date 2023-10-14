@@ -53,13 +53,15 @@ install: ## Set up local environment for Python development on pipelines
 	done ; \
 
 
-compile: ## Compile the pipeline to pipeline.yaml. Must specify pipeline=<training|prediction>
+compile: ## Compile the pipeline to pipeline.yaml. Must specify pipeline=<training|prediction> and model e.g. models=propension siniestralidad persistencia
 	@cd pipelines/src && \
-	poetry run kfp dsl compile --py pipelines/${pipeline}/pipeline.py --output pipelines/${pipeline}/pipeline.yaml --function pipeline
+	for model in $$models; do \
+	  	poetry run kfp dsl compile --py pipelines/$$model/${pipeline}/pipeline.py --output pipelines/$$model/${pipeline}/pipeline.yaml --function pipeline ; \
+	done
+
 
 targets ?= training serving
-models ?= propension
-build: ## Build and push training and/or serving container(s) image using Docker. Specify targets=<training serving> e.g. targets=training or targets="training serving" (default) and MODEL e.g. models=propension siniestralidad persistencia
+build: ## Build and push training and/or serving container(s) image using Docker. Specify targets=<training serving> e.g. targets=training or targets="training serving" (default) and model e.g. models=propension siniestralidad persistencia
 	@cd model && \
 	for model in $$models; do \
 		for target in $$targets ; do \
@@ -76,21 +78,23 @@ build: ## Build and push training and/or serving container(s) image using Docker
 compile ?= true
 build ?= true
 wait ?= false
-run: ## Run pipeline in sandbox environment. Must specify pipeline=<training|prediction>. Optionally specify wait=<true|false> (default = false). Set compile=false to skip recompiling the pipeline and set build=false to skip rebuilding container images
+run: ## Run pipeline in sandbox environment. Must specify pipeline=<training|prediction> and model e.g. models=propension siniestralidad persistencia . Optionally specify wait=<true|false> (default = false). Set compile=false to skip recompiling the pipeline and set build=false to skip rebuilding container images
 	@if [ $(compile) = "true" ]; then \
-		$(MAKE) compile ; \
+		$(MAKE) compile models=${models}; \
 	elif [ $(compile) != "false" ]; then \
 		echo "ValueError: compile must be either true or false" ; \
 		exit ; \
 	fi && \
 	if [ $(build) = "true" ]; then \
-		$(MAKE) build models=${MODELS}; \
+		$(MAKE) build models=${models}; \
 	elif [ $(build) != "false" ]; then \
 		echo "ValueError: build must be either true or false" ; \
 		exit ; \
 	fi && \
 	cd pipelines/src && \
-	poetry run python -m pipelines.utils.trigger_pipeline --template_path=pipelines/${pipeline}/pipeline.yaml --display_name=${pipeline} --wait=${wait}
+	for model in $$models; do \
+		poetry run python -m pipelines.utils.trigger_pipeline --template_path=pipelines/$$model/${pipeline}/pipeline.yaml --display_name=${pipeline} --wait=${wait}  ; \
+	done
 
 test: ## Run unit tests for a specific component group or for all component groups and the pipeline trigger code. Optionally specify GROUP=<component group e.g. vertex-components>
 	@if [ -n "${GROUP}" ]; then \

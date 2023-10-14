@@ -7,7 +7,9 @@ from sklearn.base import BaseEstimator
 from sklearn.pipeline import Pipeline
 
 
-def build_ml_pipeline(preprocessor: ColumnTransformer, model: BaseEstimator) -> Pipeline:
+def build_ml_pipeline(
+    preprocessor: ColumnTransformer, model: BaseEstimator
+) -> Pipeline:
     """Build a machine learning pipeline for training.
 
     Args:
@@ -22,7 +24,9 @@ def build_ml_pipeline(preprocessor: ColumnTransformer, model: BaseEstimator) -> 
         model = LGBMClassifier()
         pipeline = build_ml_pipeline(preprocessor, model)
     """
-    pipeline = Pipeline(steps=[("feature_engineering", preprocessor), ("train_model", model)])
+    pipeline = Pipeline(
+        steps=[("feature_engineering", preprocessor), ("train_model", model)]
+    )
     return pipeline
 
 
@@ -94,7 +98,9 @@ def calculate_feature_importance(pipeline: Pipeline) -> dict:
 
     # Sort features by its importance
     feature_importance = dict(zip(feature_names, importance))
-    sorted_importance = sorted(feature_importance.items(), key=lambda x: x[1], reverse=True)
+    sorted_importance = sorted(
+        feature_importance.items(), key=lambda x: x[1], reverse=True
+    )
     sorted_importance = {key: value for key, value in sorted_importance}
 
     return sorted_importance

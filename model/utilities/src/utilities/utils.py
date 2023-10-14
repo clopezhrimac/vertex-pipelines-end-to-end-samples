@@ -8,7 +8,9 @@ from pathlib import Path
 from sklearn.pipeline import Pipeline
 
 
-def read_datasets(train_path: str, valid_path: str, test_path: str) -> (pd.DataFrame, pd.DataFrame, pd.DataFrame):
+def read_datasets(
+    train_path: str, valid_path: str, test_path: str
+) -> (pd.DataFrame, pd.DataFrame, pd.DataFrame):
     """Read datasets from CSV files.
 
     Args:
